@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{{ title }} | Resident Logbook System</title>
+
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="shortcut icon"
+      href="https://i.ibb.co/r2VnRqFQ/323884144-14060808866171-3756633780642453548-n.jpg"
+      type="image/x-icon"
+    />
+
+    <style>
+      body {
+        background-color: #f9fafc;
+        font-family: "Segoe UI", sans-serif;
+      }
+      .btn-outline-light:hover {
+        background-color: #ffffff;
+        color: #003366 !important;
+        border-color: #ffffff;
+      }
+
+      .navbar {
+        background-color: #003366;
+      }
+
+      .navbar-brand,
+      .navbar-text,
+      .btn-outline-light {
+        color: #fff !important;
+      }
+
+      .card-header h5,
+      .table th {
+        font-weight: 600;
+        font-size: 1rem;
+      }
+
+      .status-badge {
+        font-size: 0.85em;
+        font-weight: 500;
+      }
+
+      .table-hover tbody tr[data-bs-toggle="modal"] {
+        cursor: pointer;
+      }
+
+      .table-hover tbody tr[data-bs-toggle="modal"]:hover {
+        background-color: #f0f4f8;
+      }
+
+      .modal-body small {
+        line-height: 1.6;
+        font-size: 0.95rem;
+      }
+
+      .btn i {
+        margin-right: 5px;
+      }
+
+      .card {
+        border-radius: 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg shadow-sm">
+      <div class="container">
+        <a class="navbar-brand" href="{{ url_for('main.home') }}">
+          <i class="bi bi-journal-check"></i> Resident Logbook
+        </a>
+        <div class="d-flex">
+          <span class="navbar-text me-3 d-none d-sm-block"
+            >Hello, {{ current_user.nome }}</span
+          >
+          <a
+            href="{{ url_for('main.logout') }}"
+            class="btn btn-light d-flex align-items-center gap-2 px-3 py-1 border shadow-sm"
+            style="color: #003366"
+          >
+            <i class="bi bi-box-arrow-right fs-5"></i>
+            <span class="fw-semibold">Logout</span>
+          </a>
+        </div>
+      </div>
+    </nav>
+
+    <main class="container my-5">
+      {% with messages = get_flashed_messages(with_categories=true) %} {% if
+      messages %} {% for category, message in messages %}
+      <div
+        class="alert alert-{{ category }} alert-dismissible fade show"
+        role="alert"
+      >
+        {{ message }}
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="alert"
+          aria-label="Close"
+        ></button>
+      </div>
+      {% endfor %} {% endif %} {% endwith %}
+
+      <h1 class="h3 mb-4 text-primary">
+        <i class="bi bi-person-badge"></i> Preceptor Dashboard
+      </h1>
+
+      <!-- Procedimentos Pendentes -->
+      <div class="card shadow-sm mb-5">
+        <div class="card-header bg-warning text-dark">
+          <h5>
+            <i class="bi bi-hourglass-split"></i> Pending Procedures for
+            Validation
+          </h5>
+        </div>
+        <div class="card-body">
+          <div class="table-responsive">
+            <table class="table table-hover align-middle">
+              <thead>
+                <tr>
+                  <th>Resident</th>
+                  <th>Procedure</th>
+                  <th>Date</th>
+                  <th class="text-center">Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for proc in pendentes %}
+                <tr
+                  data-bs-toggle="modal"
+                  data-bs-target="#avaliacaoModal"
+                  data-proc-id="{{ proc.id }}"
+                  data-proc-nome="{{ proc.nome_procedimento }}"
+                  data-proc-data="{{ proc.data_realizacao.strftime('%d/%m/%Y') }}"
+                  data-proc-residente="{{ proc.residente.nome }}"
+                  data-proc-historia="{{ proc.historia_clinica or 'Não informado.' }}"
+                  data-proc-exame="{{ proc.exame_fisico or 'Não informado.' }}"
+                  data-proc-interpretacao="{{ proc.interpretacao_diagnostico or 'Não informado.' }}"
+                  data-proc-plano="{{ proc.plano_terapeutico or 'Não informado.' }}"
+                  data-proc-orientacao="{{ proc.orientacao_paciente or 'Não informado.' }}"
+                  data-proc-conhecimento="{{ proc.conhecimento_aprendizagem or 'Não informado.' }}"
+                >
+                  <td>{{ proc.residente.nome }}</td>
+                  <td><strong>{{ proc.nome_procedimento }}</strong></td>
+                  <td>{{ proc.data_realizacao.strftime('%d/%m/%Y') }}</td>
+                  <td class="text-center">
+                    <button class="btn btn-sm btn-outline-primary">
+                      <i class="bi bi-pencil-square"></i> Evaluate
+                    </button>
+                  </td>
+                </tr>
+                {% else %}
+                <tr>
+                  <td colspan="4" class="text-center text-muted py-4">
+                    No pending procedures.
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Relatórios -->
+      <div class="card shadow-sm mb-5">
+        <div class="card-header bg-info text-white">
+          <h5><i class="bi bi-download"></i> Reports by Resident</h5>
+        </div>
+        <div class="list-group list-group-flush">
+          {% for res in residentes %}
+          <a
+            href="{{ url_for('main.gerar_relatorio', residente_id=res.id) }}"
+            target="_blank"
+            class="list-group-item list-group-item-action d-flex justify-content-between align-items-center"
+          >
+            {{ res.nome }}
+            <span class="badge bg-primary rounded-pill">
+              <i class="bi bi-file-earmark-pdf"></i> PDF
+            </span>
+          </a>
+          {% else %}
+          <div class="list-group-item text-muted">No residents available.</div>
+          {% endfor %}
+        </div>
+      </div>
+
+      <!-- Histórico -->
+      <div class="card shadow-sm">
+        <div class="card-header bg-light">
+          <h5><i class="bi bi-clock-history"></i> Evaluation History</h5>
+        </div>
+        <div class="card-body">
+          <div class="table-responsive">
+            <table class="table table-hover align-middle">
+              <thead>
+                <tr>
+                  <th>Resident</th>
+                  <th>Procedure</th>
+                  <th>Date</th>
+                  <th class="text-center">Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for proc in avaliados %}
+                <tr
+                  data-bs-toggle="modal"
+                  data-bs-target="#detalhesModal"
+                  data-proc-nome="{{ proc.nome_procedimento }}"
+                  data-proc-data="{{ proc.data_realizacao.strftime('%d/%m/%Y') }}"
+                  data-proc-residente="{{ proc.residente.nome }}"
+                  data-proc-status="{{ proc.status }}"
+                  data-proc-historia="{{ proc.historia_clinica or 'Não informado.' }}"
+                  data-proc-exame="{{ proc.exame_fisico or 'Não informado.' }}"
+                  data-proc-interpretacao="{{ proc.interpretacao_diagnostico or 'Não informado.' }}"
+                  data-proc-plano="{{ proc.plano_terapeutico or 'Não informado.' }}"
+                  data-proc-orientacao="{{ proc.orientacao_paciente or 'Não informado.' }}"
+                  data-proc-conhecimento="{{ proc.conhecimento_aprendizagem or 'Não informado.' }}"
+                  data-proc-obs="{{ proc.observacao_preceptor or 'No observations recorded.' }}"
+                >
+                  <td>{{ proc.residente.nome }}</td>
+                  <td><strong>{{ proc.nome_procedimento }}</strong></td>
+                  <td>{{ proc.data_realizacao.strftime('%d/%m/%Y') }}</td>
+                  <td class="text-center">
+                    {% if proc.status == 'Validado' %}
+                    <span class="badge rounded-pill bg-success status-badge"
+                      >Validated</span
+                    >
+                    {% elif proc.status == 'Rejeitado' %}
+                    <span class="badge rounded-pill bg-danger status-badge"
+                      >Rejected</span
+                    >
+                    {% endif %}
+                  </td>
+                </tr>
+                {% else %}
+                <tr>
+                  <td colspan="4" class="text-center text-muted py-4">
+                    No procedures evaluated yet.
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    {% include 'modais_preceptor.html' %}
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        // Modal de Avaliação
+        const avlModal = document.getElementById("avaliacaoModal");
+        if (avlModal) {
+          avlModal.addEventListener("show.bs.modal", (event) => {
+            const row = event.relatedTarget.closest("tr");
+            const data = row.dataset;
+            avlModal.querySelector("#modal-avl-nome").textContent =
+              data.procNome;
+            avlModal.querySelector("#modal-avl-residente").textContent =
+              data.procResidente;
+            avlModal.querySelector("#modal-avl-data").textContent =
+              data.procData;
+            // Preencher campos HEIPOC
+            avlModal.querySelector("#modal-avl-historia").textContent =
+              data.procHistoria;
+            avlModal.querySelector("#modal-avl-exame").textContent =
+              data.procExame;
+            avlModal.querySelector("#modal-avl-interpretacao").textContent =
+              data.procInterpretacao;
+            avlModal.querySelector("#modal-avl-plano").textContent =
+              data.procPlano;
+            avlModal.querySelector("#modal-avl-orientacao").textContent =
+              data.procOrientacao;
+            avlModal.querySelector("#modal-avl-conhecimento").textContent =
+              data.procConhecimento;
+            avlModal.querySelector('input[name="procedimento_id"]').value =
+              data.procId;
+          });
+        }
+
+        // Modal de Detalhes
+        const detModal = document.getElementById("detalhesModal");
+        if (detModal) {
+          detModal.addEventListener("show.bs.modal", (event) => {
+            const row = event.relatedTarget.closest("tr");
+            const data = row.dataset;
+            detModal.querySelector("#modal-det-nome").textContent =
+              data.procNome;
+            detModal.querySelector("#modal-det-residente").textContent =
+              data.procResidente;
+            detModal.querySelector("#modal-det-data").textContent =
+              data.procData;
+            // Preencher campos HEIPOC
+            detModal.querySelector("#modal-det-historia").textContent =
+              data.procHistoria;
+            detModal.querySelector("#modal-det-exame").textContent =
+              data.procExame;
+            detModal.querySelector("#modal-det-interpretacao").textContent =
+              data.procInterpretacao;
+            detModal.querySelector("#modal-det-plano").textContent =
+              data.procPlano;
+            detModal.querySelector("#modal-det-orientacao").textContent =
+              data.procOrientacao;
+            detModal.querySelector("#modal-det-conhecimento").textContent =
+              data.procConhecimento;
+            detModal.querySelector("#modal-det-obs").textContent = data.procObs;
+
+            const badge = detModal.querySelector("#modal-det-status");
+            badge.textContent = data.procStatus;
+            badge.className = "badge rounded-pill status-badge";
+            if (data.procStatus === "Validado")
+              badge.classList.add("bg-success");
+            if (data.procStatus === "Rejeitado")
+              badge.classList.add("bg-danger");
+          });
+        }
+      });
+    </script>
+  </body>
+</html>

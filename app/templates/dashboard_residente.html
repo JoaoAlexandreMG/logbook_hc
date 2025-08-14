@@ -1,0 +1,799 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{{ title }} | Resident Logbook System</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/material_blue.css"
+    />
+    <link
+      rel="shortcut icon"
+      href="https://i.ibb.co/r2VnRqFQ/323884144-14060808866171-3756633780642453548-n.jpg"
+      type="image/x-icon"
+    />
+    <style>
+      body {
+        background-color: #f8f9fa;
+      }
+
+      .status-badge {
+        font-size: 0.78rem;
+        padding: 0.4em 0.75em;
+        font-weight: 500;
+      }
+
+      .table-hover tbody tr:hover {
+        background-color: #eaf4ff !important;
+        cursor: pointer;
+      }
+
+      .card {
+        border: none;
+        border-radius: 12px;
+      }
+
+      .card-body {
+        padding: 1.5rem;
+      }
+
+      h1,
+      h2,
+      h5 {
+        font-weight: 600;
+      }
+
+      .btn {
+        border-radius: 8px;
+      }
+
+      .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1rem;
+      }
+
+      .page-header h1 {
+        font-size: 1.7rem;
+        color: #003b73;
+      }
+
+      @media (max-width: 576px) {
+        .page-header {
+          flex-direction: column;
+          align-items: flex-start;
+        }
+
+        .page-header h1 {
+          font-size: 1.5rem;
+        }
+
+        .page-header .btn {
+          width: 100%;
+          justify-content: center;
+        }
+
+        .modal-content {
+          border-radius: 14px;
+        }
+
+        .modal-body h6 {
+          font-size: 1.1rem;
+        }
+      }
+
+      /* Estilos customizados para o Flatpickr */
+      .flatpickr-input {
+        cursor: pointer !important;
+      }
+
+      .input-group .flatpickr-input:focus {
+        border-color: #0d6efd;
+        box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+      }
+
+      .input-group-text {
+        background-color: #f8f9fa;
+        border-color: #dee2e6;
+        color: #0d6efd;
+      }
+
+      .flatpickr-calendar {
+        font-family: inherit;
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+        border: none !important;
+        border-radius: 12px !important;
+      }
+    </style>
+  </head>
+  <body>
+    <nav
+      class="navbar navbar-expand-lg navbar-dark shadow-sm"
+      style="background: linear-gradient(90deg, #0057a8, #007bff)"
+    >
+      <div class="container">
+        <a class="navbar-brand" href="{{ url_for('main.home') }}">
+          <i class="bi bi-journal-check"></i> Resident Logbook
+        </a>
+        <div class="d-flex align-items-center">
+          <span class="navbar-text me-3 d-none d-sm-block"
+            >Hello, {{ current_user.nome }}</span
+          >
+          <a href="{{ url_for('main.logout') }}" class="btn btn-outline-light">
+            <i class="bi bi-box-arrow-right"></i> Logout
+          </a>
+        </div>
+      </div>
+    </nav>
+
+    <main class="container my-5">
+      {% with messages = get_flashed_messages(with_categories=true) %} {% if
+      messages %} {% for category, message in messages %}
+      <div
+        class="alert alert-{{ category }} alert-dismissible fade show"
+        role="alert"
+      >
+        {{ message }}
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="alert"
+          aria-label="Close"
+        ></button>
+      </div>
+      {% endfor %} {% endif %} {% endwith %}
+
+      <div class="page-header mb-4">
+        <h1 class="h2 mb-0">My Procedures</h1>
+        <div class="d-flex gap-2">
+          <a
+            href="{{ url_for('main.gerar_relatorio', residente_id=current_user.id) }}"
+            class="btn btn-info d-flex align-items-center"
+            target="_blank"
+          >
+            <i class="bi bi-file-earmark-pdf-fill me-2"></i>
+            <span>Generate Report</span>
+          </a>
+          <button
+            type="button"
+            class="btn btn-primary d-flex align-items-center"
+            data-bs-toggle="modal"
+            data-bs-target="#procedimentoModal"
+          >
+            <i class="bi bi-plus-circle-fill me-2"></i>
+            <span>Register Procedure</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <div class="table-responsive">
+            <table class="table table-hover align-middle">
+              <thead class="table-light">
+                <tr>
+                  <th>Procedure</th>
+                  <th>Date</th>
+                  <th>Preceptor</th>
+                  <th class="text-center">Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for proc in procedimentos %} {% set obs_text %} {% if
+                proc.status == 'Pending' %} Awaiting evaluation... {% elif
+                proc.observacao_preceptor %}{{ proc.observacao_preceptor }} {%
+                else %}No observation was made. {% endif %} {% endset %}
+
+                <tr
+                  data-bs-toggle="modal"
+                  data-bs-target="#detalhesModal"
+                  data-proc-nome="{{ proc.nome_procedimento }}"
+                  data-proc-data="{{ proc.data_realizacao.strftime('%d/%m/%Y') }}"
+                  data-proc-preceptor="{{ proc.preceptor.nome }}"
+                  data-proc-status="{{ proc.status }}"
+                  data-proc-historia="{{ proc.historia_clinica or 'Não informado.' }}"
+                  data-proc-exame="{{ proc.exame_fisico or 'Não informado.' }}"
+                  data-proc-interpretacao="{{ proc.interpretacao_diagnostico or 'Não informado.' }}"
+                  data-proc-plano="{{ proc.plano_terapeutico or 'Não informado.' }}"
+                  data-proc-orientacao="{{ proc.orientacao_paciente or 'Não informado.' }}"
+                  data-proc-conhecimento="{{ proc.conhecimento_aprendizagem or 'Não informado.' }}"
+                  data-proc-obs="{{ obs_text|trim }}"
+                >
+                  <td><strong>{{ proc.nome_procedimento }}</strong></td>
+                  <td>{{ proc.data_realizacao.strftime('%d/%m/%Y') }}</td>
+                  <td>{{ proc.preceptor.nome }}</td>
+                  <td class="text-center">
+                    {% if proc.status == 'Pendente' %}
+                    <span
+                      class="badge rounded-pill bg-warning text-dark status-badge"
+                      >Pending</span
+                    >
+                    {% elif proc.status == 'Validado' %}
+                    <span class="badge rounded-pill bg-success status-badge"
+                      >Validated</span
+                    >
+                    {% elif proc.status == 'Rejeitado' %}
+                    <span class="badge rounded-pill bg-danger status-badge"
+                      >Rejected</span
+                    >
+                    {% endif %}
+                  </td>
+                </tr>
+                {% else %}
+                <tr>
+                  <td colspan="4" class="text-center text-muted py-4">
+                    No procedures registered yet.
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- Modal de Registro -->
+    <div
+      class="modal fade"
+      id="procedimentoModal"
+      tabindex="-1"
+      aria-labelledby="procedimentoModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <form
+            method="POST"
+            action="{{ url_for('main.dashboard_residente') }}"
+          >
+            {{ form.hidden_tag() }}
+            <div class="modal-header">
+              <h5 class="modal-title" id="procedimentoModalLabel">
+                Register New Procedure
+              </h5>
+              <button
+                type="button"
+                class="btn-close"
+                data-bs-dismiss="modal"
+                aria-label="Close"
+              ></button>
+            </div>
+            <div class="modal-body">
+              <div class="mb-3">
+                <label class="form-label" for="nome_procedimento"
+                  >Procedure Name</label
+                >
+                <input
+                  class="form-control form-control-lg"
+                  id="nome_procedimento"
+                  name="nome_procedimento"
+                  required
+                  type="text"
+                />
+              </div>
+              <div class="row">
+                <div class="col-md-6">
+                  <div class="mb-3">
+                    <label class="form-label" for="data_realizacao"
+                      >Date of Procedure</label
+                    >
+                    <div class="input-group">
+                      <span class="input-group-text">
+                        <i class="bi bi-calendar-event"></i>
+                      </span>
+                      <input
+                        type="text"
+                        class="form-control form-control-lg"
+                        id="data_realizacao"
+                        name="data_realizacao"
+                        placeholder="Select date"
+                        required
+                        readonly
+                      />
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="mb-3">
+                    <label class="form-label" for="preceptor"
+                      >Responsible Preceptor</label
+                    >
+                    {{ form.preceptor(class="form-select form-select-lg") }}
+                  </div>
+                </div>
+              </div>
+              <div class="mb-3">
+                <label class="form-label" for="historia_clinica">
+                  <i class="bi bi-clipboard2-pulse me-2"></i>H - História
+                  Clínica *
+                </label>
+                {{ form.historia_clinica(class="form-control", rows="4") }}
+                <div class="form-text">
+                  Descreva a queixa principal, sintomas, história da doença
+                  atual e antecedentes relevantes.
+                </div>
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label" for="exame_fisico">
+                  <i class="bi bi-heart-pulse me-2"></i>E - Exame Físico *
+                </label>
+                {{ form.exame_fisico(class="form-control", rows="4") }}
+                <div class="form-text">
+                  Detalhe os achados do exame físico: sinais vitais, inspeção,
+                  palpação, etc.
+                </div>
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label" for="interpretacao_diagnostico">
+                  <i class="bi bi-search me-2"></i>I - Interpretação e
+                  Diagnósticos *
+                </label>
+                {{ form.interpretacao_diagnostico(class="form-control",
+                rows="4") }}
+                <div class="form-text">
+                  Interpretação dos achados e formulação de hipóteses
+                  diagnósticas.
+                </div>
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label" for="plano_terapeutico">
+                  <i class="bi bi-tools me-2"></i>P - Plano Terapêutico *
+                </label>
+                {{ form.plano_terapeutico(class="form-control", rows="4") }}
+                <div class="form-text">
+                  Descreva o tratamento realizado: medicações, procedimentos,
+                  condutas.
+                </div>
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label" for="orientacao_paciente">
+                  <i class="bi bi-chat-dots me-2"></i>O - Orientação ao Paciente
+                  *
+                </label>
+                {{ form.orientacao_paciente(class="form-control", rows="3") }}
+                <div class="form-text">
+                  Orientações fornecidas ao paciente sobre cuidados, medicações,
+                  retorno.
+                </div>
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label" for="conhecimento_aprendizagem">
+                  <i class="bi bi-lightbulb me-2"></i>C - Conhecimento e
+                  Aprendizagem *
+                </label>
+                {{ form.conhecimento_aprendizagem(class="form-control",
+                rows="4") }}
+                <div class="form-text">
+                  Reflexões sobre o aprendizado: o que aprendeu, dificuldades,
+                  conhecimentos adquiridos.
+                </div>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button
+                type="button"
+                class="btn btn-secondary"
+                data-bs-dismiss="modal"
+              >
+                Cancel
+              </button>
+              <button type="submit" class="btn btn-primary" id="submitBtn">
+                <i class="bi bi-check-circle me-2"></i>Register Procedure
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal de Detalhes -->
+    <div
+      class="modal fade"
+      id="detalhesModal"
+      tabindex="-1"
+      aria-labelledby="detalhesModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="detalhesModalLabel">
+              Procedure Details
+            </h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <h6
+              id="modal-detalhe-nome"
+              class="mb-3 fs-5 fw-bold text-primary"
+            ></h6>
+
+            <div class="row g-2 mb-3">
+              <div class="col-sm-6">
+                <div class="bg-light border rounded p-2">
+                  <strong>Date:</strong><br />
+                  <span id="modal-detalhe-data"></span>
+                </div>
+              </div>
+              <div class="col-sm-6">
+                <div class="bg-light border rounded p-2">
+                  <strong>Preceptor:</strong><br />
+                  <span id="modal-detalhe-preceptor"></span>
+                </div>
+              </div>
+              <div class="col-sm-12">
+                <div class="bg-light border rounded p-2 mt-2">
+                  <strong>Status:</strong>
+                  <span
+                    id="modal-detalhe-status"
+                    class="badge float-end"
+                  ></span>
+                </div>
+              </div>
+            </div>
+
+            <hr class="my-3" />
+
+            <div class="procedure-details">
+              <p class="mb-3 fw-semibold">Detailed Procedure Report:</p>
+
+              <div class="accordion" id="procedureAccordion">
+                <div class="accordion-item">
+                  <h2 class="accordion-header" id="historiaHeader">
+                    <button
+                      class="accordion-button"
+                      type="button"
+                      data-bs-toggle="collapse"
+                      data-bs-target="#historiaCollapse"
+                    >
+                      <i class="bi bi-clipboard2-pulse me-2"></i>H - História
+                      Clínica
+                    </button>
+                  </h2>
+                  <div
+                    id="historiaCollapse"
+                    class="accordion-collapse collapse show"
+                    data-bs-parent="#procedureAccordion"
+                  >
+                    <div class="accordion-body">
+                      <div id="modal-detalhe-historia" class="text-muted"></div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="accordion-item">
+                  <h2 class="accordion-header" id="exameHeader">
+                    <button
+                      class="accordion-button collapsed"
+                      type="button"
+                      data-bs-toggle="collapse"
+                      data-bs-target="#exameCollapse"
+                    >
+                      <i class="bi bi-heart-pulse me-2"></i>E - Exame Físico
+                    </button>
+                  </h2>
+                  <div
+                    id="exameCollapse"
+                    class="accordion-collapse collapse"
+                    data-bs-parent="#procedureAccordion"
+                  >
+                    <div class="accordion-body">
+                      <div id="modal-detalhe-exame" class="text-muted"></div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="accordion-item">
+                  <h2 class="accordion-header" id="interpretacaoHeader">
+                    <button
+                      class="accordion-button collapsed"
+                      type="button"
+                      data-bs-toggle="collapse"
+                      data-bs-target="#interpretacaoCollapse"
+                    >
+                      <i class="bi bi-search me-2"></i>I - Interpretação e
+                      Diagnósticos
+                    </button>
+                  </h2>
+                  <div
+                    id="interpretacaoCollapse"
+                    class="accordion-collapse collapse"
+                    data-bs-parent="#procedureAccordion"
+                  >
+                    <div class="accordion-body">
+                      <div
+                        id="modal-detalhe-interpretacao"
+                        class="text-muted"
+                      ></div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="accordion-item">
+                  <h2 class="accordion-header" id="planoHeader">
+                    <button
+                      class="accordion-button collapsed"
+                      type="button"
+                      data-bs-toggle="collapse"
+                      data-bs-target="#planoCollapse"
+                    >
+                      <i class="bi bi-tools me-2"></i>P - Plano Terapêutico
+                    </button>
+                  </h2>
+                  <div
+                    id="planoCollapse"
+                    class="accordion-collapse collapse"
+                    data-bs-parent="#procedureAccordion"
+                  >
+                    <div class="accordion-body">
+                      <div id="modal-detalhe-plano" class="text-muted"></div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="accordion-item">
+                  <h2 class="accordion-header" id="orientacaoHeader">
+                    <button
+                      class="accordion-button collapsed"
+                      type="button"
+                      data-bs-toggle="collapse"
+                      data-bs-target="#orientacaoCollapse"
+                    >
+                      <i class="bi bi-chat-dots me-2"></i>O - Orientação ao
+                      Paciente
+                    </button>
+                  </h2>
+                  <div
+                    id="orientacaoCollapse"
+                    class="accordion-collapse collapse"
+                    data-bs-parent="#procedureAccordion"
+                  >
+                    <div class="accordion-body">
+                      <div
+                        id="modal-detalhe-orientacao"
+                        class="text-muted"
+                      ></div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="accordion-item">
+                  <h2 class="accordion-header" id="conhecimentoHeader">
+                    <button
+                      class="accordion-button collapsed"
+                      type="button"
+                      data-bs-toggle="collapse"
+                      data-bs-target="#conhecimentoCollapse"
+                    >
+                      <i class="bi bi-lightbulb me-2"></i>C - Conhecimento e
+                      Aprendizagem
+                    </button>
+                  </h2>
+                  <div
+                    id="conhecimentoCollapse"
+                    class="accordion-collapse collapse"
+                    data-bs-parent="#procedureAccordion"
+                  >
+                    <div class="accordion-body">
+                      <div
+                        id="modal-detalhe-conhecimento"
+                        class="text-muted"
+                      ></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <p class="mb-1 fw-semibold mt-4">Preceptor's Observations:</p>
+            <div
+              class="bg-white border rounded p-3 fw-bold small text-muted"
+              id="modal-detalhe-obs"
+            ></div>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-primary"
+              data-bs-dismiss="modal"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/pt.js"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        // Configure Flatpickr for date field
+        flatpickr("#data_realizacao", {
+          locale: "en",
+          dateFormat: "Y-m-d", // Backend format
+          allowInput: false,
+          disableMobile: "true",
+          maxDate: "today",
+          defaultDate: "today",
+          theme: "material_blue",
+          clickOpens: true,
+          altInput: true, // Show user-friendly format
+          altFormat: "m/d/Y", // Format shown to user
+        });
+
+        // Add form validation
+        const form = document.querySelector("#procedimentoModal form");
+        if (form) {
+          form.addEventListener("submit", function (e) {
+            const nomeProc = document.getElementById("nome_procedimento").value;
+            const dataReal = document.getElementById("data_realizacao").value;
+            const preceptorSelect = document.querySelector(
+              'select[name="preceptor"]'
+            );
+            const preceptor = preceptorSelect ? preceptorSelect.value : "";
+
+            // Validar campos HEIPOC obrigatórios
+            const historia = document.querySelector(
+              'textarea[name="historia_clinica"]'
+            ).value;
+            const exame = document.querySelector(
+              'textarea[name="exame_fisico"]'
+            ).value;
+            const interpretacao = document.querySelector(
+              'textarea[name="interpretacao_diagnostico"]'
+            ).value;
+            const plano = document.querySelector(
+              'textarea[name="plano_terapeutico"]'
+            ).value;
+            const orientacao = document.querySelector(
+              'textarea[name="orientacao_paciente"]'
+            ).value;
+            const conhecimento = document.querySelector(
+              'textarea[name="conhecimento_aprendizagem"]'
+            ).value;
+
+            if (!nomeProc) {
+              e.preventDefault();
+              alert("Por favor, preencha o nome do procedimento.");
+              return false;
+            }
+
+            if (!dataReal) {
+              e.preventDefault();
+              alert("Por favor, selecione a data.");
+              return false;
+            }
+
+            if (!preceptor) {
+              e.preventDefault();
+              alert("Por favor, selecione um preceptor.");
+              return false;
+            }
+
+            if (!historia || historia.length < 10) {
+              e.preventDefault();
+              alert(
+                "Por favor, descreva a história clínica com detalhes (mínimo 10 caracteres)."
+              );
+              return false;
+            }
+
+            if (!exame || exame.length < 10) {
+              e.preventDefault();
+              alert(
+                "Por favor, detalhe os achados do exame físico (mínimo 10 caracteres)."
+              );
+              return false;
+            }
+
+            if (!interpretacao || interpretacao.length < 10) {
+              e.preventDefault();
+              alert(
+                "Por favor, descreva a interpretação e diagnósticos (mínimo 10 caracteres)."
+              );
+              return false;
+            }
+
+            if (!plano || plano.length < 10) {
+              e.preventDefault();
+              alert(
+                "Por favor, detalhe o plano terapêutico (mínimo 10 caracteres)."
+              );
+              return false;
+            }
+
+            if (!orientacao || orientacao.length < 10) {
+              e.preventDefault();
+              alert(
+                "Por favor, descreva as orientações ao paciente (mínimo 10 caracteres)."
+              );
+              return false;
+            }
+
+            if (!conhecimento || conhecimento.length < 10) {
+              e.preventDefault();
+              alert(
+                "Por favor, reflita sobre o conhecimento e aprendizagem (mínimo 10 caracteres)."
+              );
+              return false;
+            }
+          });
+        }
+
+        // Modal de detalhes - código existente
+        const detalhesModalEl = document.getElementById("detalhesModal");
+        if (detalhesModalEl) {
+          detalhesModalEl.addEventListener("show.bs.modal", function (event) {
+            const row = event.relatedTarget;
+            const data = row.dataset;
+            const modal = this;
+
+            modal.querySelector("#modal-detalhe-nome").textContent =
+              data.procNome;
+            modal.querySelector("#modal-detalhe-data").textContent =
+              data.procData;
+            modal.querySelector("#modal-detalhe-preceptor").textContent =
+              data.procPreceptor;
+
+            // Popular os campos HEIPOC
+            modal.querySelector("#modal-detalhe-historia").textContent =
+              data.procHistoria;
+            modal.querySelector("#modal-detalhe-exame").textContent =
+              data.procExame;
+            modal.querySelector("#modal-detalhe-interpretacao").textContent =
+              data.procInterpretacao;
+            modal.querySelector("#modal-detalhe-plano").textContent =
+              data.procPlano;
+            modal.querySelector("#modal-detalhe-orientacao").textContent =
+              data.procOrientacao;
+            modal.querySelector("#modal-detalhe-conhecimento").textContent =
+              data.procConhecimento;
+
+            modal.querySelector("#modal-detalhe-obs").textContent =
+              data.procObs;
+
+            const statusBadge = modal.querySelector("#modal-detalhe-status");
+            statusBadge.textContent = data.procStatus;
+            statusBadge.className = "badge rounded-pill status-badge";
+
+            if (data.procStatus === "Pendente") {
+              statusBadge.classList.add("bg-warning", "text-dark");
+            } else if (data.procStatus === "Validado") {
+              statusBadge.classList.add("bg-success");
+            } else if (data.procStatus === "Rejeitado") {
+              statusBadge.classList.add("bg-danger");
+            }
+          });
+        }
+      });
+    </script>
+  </body>
+</html>

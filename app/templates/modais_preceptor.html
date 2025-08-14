@@ -1,0 +1,386 @@
+<!-- Modal de Avaliação -->
+<div
+  class="modal fade"
+  id="avaliacaoModal"
+  tabindex="-1"
+  aria-labelledby="avaliacaoModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content">
+      <form method="POST" action="{{ url_for('main.dashboard_preceptor') }}">
+        {{ form_avaliacao.hidden_tag() }} {{ form_avaliacao.procedimento_id }}
+
+        <div class="modal-header">
+          <h5 class="modal-title" id="avaliacaoModalLabel">
+            <i class="bi bi-check2-square"></i> Avaliar Procedimento
+          </h5>
+          <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="modal"
+            aria-label="Fechar"
+          ></button>
+        </div>
+
+        <div class="modal-body">
+          <h6>Detalhes do Registro</h6>
+          <p>
+            <strong>Procedimento:</strong> <span id="modal-avl-nome"></span>
+          </p>
+          <p>
+            <strong>Residente:</strong> <span id="modal-avl-residente"></span>
+          </p>
+          <p><strong>Data:</strong> <span id="modal-avl-data"></span></p>
+
+          <hr />
+          <h6>Metodologia HEIPOC</h6>
+
+          <div class="accordion" id="heipocAccordion">
+            <div class="accordion-item">
+              <h2 class="accordion-header">
+                <button
+                  class="accordion-button"
+                  type="button"
+                  data-bs-toggle="collapse"
+                  data-bs-target="#historiaCollapse"
+                >
+                  <strong>H - História Clínica</strong>
+                </button>
+              </h2>
+              <div
+                id="historiaCollapse"
+                class="accordion-collapse collapse show"
+                data-bs-parent="#heipocAccordion"
+              >
+                <div class="accordion-body">
+                  <small id="modal-avl-historia" class="text-muted"></small>
+                </div>
+              </div>
+            </div>
+
+            <div class="accordion-item">
+              <h2 class="accordion-header">
+                <button
+                  class="accordion-button collapsed"
+                  type="button"
+                  data-bs-toggle="collapse"
+                  data-bs-target="#exameCollapse"
+                >
+                  <strong>E - Exame Físico</strong>
+                </button>
+              </h2>
+              <div
+                id="exameCollapse"
+                class="accordion-collapse collapse"
+                data-bs-parent="#heipocAccordion"
+              >
+                <div class="accordion-body">
+                  <small id="modal-avl-exame" class="text-muted"></small>
+                </div>
+              </div>
+            </div>
+
+            <div class="accordion-item">
+              <h2 class="accordion-header">
+                <button
+                  class="accordion-button collapsed"
+                  type="button"
+                  data-bs-toggle="collapse"
+                  data-bs-target="#interpretacaoCollapse"
+                >
+                  <strong>I - Interpretação e Diagnósticos</strong>
+                </button>
+              </h2>
+              <div
+                id="interpretacaoCollapse"
+                class="accordion-collapse collapse"
+                data-bs-parent="#heipocAccordion"
+              >
+                <div class="accordion-body">
+                  <small
+                    id="modal-avl-interpretacao"
+                    class="text-muted"
+                  ></small>
+                </div>
+              </div>
+            </div>
+
+            <div class="accordion-item">
+              <h2 class="accordion-header">
+                <button
+                  class="accordion-button collapsed"
+                  type="button"
+                  data-bs-toggle="collapse"
+                  data-bs-target="#planoCollapse"
+                >
+                  <strong>P - Plano Terapêutico</strong>
+                </button>
+              </h2>
+              <div
+                id="planoCollapse"
+                class="accordion-collapse collapse"
+                data-bs-parent="#heipocAccordion"
+              >
+                <div class="accordion-body">
+                  <small id="modal-avl-plano" class="text-muted"></small>
+                </div>
+              </div>
+            </div>
+
+            <div class="accordion-item">
+              <h2 class="accordion-header">
+                <button
+                  class="accordion-button collapsed"
+                  type="button"
+                  data-bs-toggle="collapse"
+                  data-bs-target="#orientacaoCollapse"
+                >
+                  <strong>O - Orientação ao Paciente</strong>
+                </button>
+              </h2>
+              <div
+                id="orientacaoCollapse"
+                class="accordion-collapse collapse"
+                data-bs-parent="#heipocAccordion"
+              >
+                <div class="accordion-body">
+                  <small id="modal-avl-orientacao" class="text-muted"></small>
+                </div>
+              </div>
+            </div>
+
+            <div class="accordion-item">
+              <h2 class="accordion-header">
+                <button
+                  class="accordion-button collapsed"
+                  type="button"
+                  data-bs-toggle="collapse"
+                  data-bs-target="#conhecimentoCollapse"
+                >
+                  <strong>C - Conhecimento e Aprendizagem</strong>
+                </button>
+              </h2>
+              <div
+                id="conhecimentoCollapse"
+                class="accordion-collapse collapse"
+                data-bs-parent="#heipocAccordion"
+              >
+                <div class="accordion-body">
+                  <small id="modal-avl-conhecimento" class="text-muted"></small>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <hr />
+          <h6>Sua Avaliação</h6>
+          <div class="mb-3">
+            {{ form_avaliacao.observacao.label(class="form-label") }} {{
+            form_avaliacao.observacao(class="form-control", rows="4") }}
+          </div>
+        </div>
+
+        <div class="modal-footer justify-content-between">
+          <button
+            type="button"
+            class="btn btn-secondary"
+            data-bs-dismiss="modal"
+          >
+            Cancelar
+          </button>
+          <div>
+            {{ form_avaliacao.rejeitar(class="btn btn-danger") }} {{
+            form_avaliacao.validar(class="btn btn-success") }}
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de Detalhes -->
+<div
+  class="modal fade"
+  id="detalhesModal"
+  tabindex="-1"
+  aria-labelledby="detalhesModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="detalhesModalLabel">
+          <i class="bi bi-eye"></i> Detalhes do Procedimento Avaliado
+        </h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Fechar"
+        ></button>
+      </div>
+
+      <div class="modal-body">
+        <h6 id="modal-det-nome" class="mb-3 display-6"></h6>
+        <p><strong>Data:</strong> <span id="modal-det-data"></span></p>
+        <p>
+          <strong>Residente:</strong> <span id="modal-det-residente"></span>
+        </p>
+        <p>
+          <strong>Status da Avaliação:</strong>
+          <span id="modal-det-status" class="badge"></span>
+        </p>
+
+        <hr />
+        <h6>Metodologia HEIPOC</h6>
+
+        <div class="accordion" id="heipocAccordionDet">
+          <div class="accordion-item">
+            <h2 class="accordion-header">
+              <button
+                class="accordion-button"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#historiaCollapseDet"
+              >
+                <strong>H - História Clínica</strong>
+              </button>
+            </h2>
+            <div
+              id="historiaCollapseDet"
+              class="accordion-collapse collapse show"
+              data-bs-parent="#heipocAccordionDet"
+            >
+              <div class="accordion-body">
+                <small id="modal-det-historia" class="text-muted"></small>
+              </div>
+            </div>
+          </div>
+
+          <div class="accordion-item">
+            <h2 class="accordion-header">
+              <button
+                class="accordion-button collapsed"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#exameCollapseDet"
+              >
+                <strong>E - Exame Físico</strong>
+              </button>
+            </h2>
+            <div
+              id="exameCollapseDet"
+              class="accordion-collapse collapse"
+              data-bs-parent="#heipocAccordionDet"
+            >
+              <div class="accordion-body">
+                <small id="modal-det-exame" class="text-muted"></small>
+              </div>
+            </div>
+          </div>
+
+          <div class="accordion-item">
+            <h2 class="accordion-header">
+              <button
+                class="accordion-button collapsed"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#interpretacaoCollapseDet"
+              >
+                <strong>I - Interpretação e Diagnósticos</strong>
+              </button>
+            </h2>
+            <div
+              id="interpretacaoCollapseDet"
+              class="accordion-collapse collapse"
+              data-bs-parent="#heipocAccordionDet"
+            >
+              <div class="accordion-body">
+                <small id="modal-det-interpretacao" class="text-muted"></small>
+              </div>
+            </div>
+          </div>
+
+          <div class="accordion-item">
+            <h2 class="accordion-header">
+              <button
+                class="accordion-button collapsed"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#planoCollapseDet"
+              >
+                <strong>P - Plano Terapêutico</strong>
+              </button>
+            </h2>
+            <div
+              id="planoCollapseDet"
+              class="accordion-collapse collapse"
+              data-bs-parent="#heipocAccordionDet"
+            >
+              <div class="accordion-body">
+                <small id="modal-det-plano" class="text-muted"></small>
+              </div>
+            </div>
+          </div>
+
+          <div class="accordion-item">
+            <h2 class="accordion-header">
+              <button
+                class="accordion-button collapsed"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#orientacaoCollapseDet"
+              >
+                <strong>O - Orientação ao Paciente</strong>
+              </button>
+            </h2>
+            <div
+              id="orientacaoCollapseDet"
+              class="accordion-collapse collapse"
+              data-bs-parent="#heipocAccordionDet"
+            >
+              <div class="accordion-body">
+                <small id="modal-det-orientacao" class="text-muted"></small>
+              </div>
+            </div>
+          </div>
+
+          <div class="accordion-item">
+            <h2 class="accordion-header">
+              <button
+                class="accordion-button collapsed"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#conhecimentoCollapseDet"
+              >
+                <strong>C - Conhecimento e Aprendizagem</strong>
+              </button>
+            </h2>
+            <div
+              id="conhecimentoCollapseDet"
+              class="accordion-collapse collapse"
+              data-bs-parent="#heipocAccordionDet"
+            >
+              <div class="accordion-body">
+                <small id="modal-det-conhecimento" class="text-muted"></small>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <hr />
+        <p class="mb-1"><strong>Suas Observações:</strong></p>
+        <p class="bg-light p-2 rounded border fw-bold">
+          <small id="modal-det-obs"></small>
+        </p>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">
+          Fechar
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

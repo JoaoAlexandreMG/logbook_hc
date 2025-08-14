@@ -1,0 +1,12 @@
+Flask==2.3.3
+Flask-Login==0.6.2
+Flask-SQLAlchemy==3.0.5
+Flask-WTF==1.1.1
+Flask-Mail==0.9.1
+WTForms==3.0.1
+requests==2.31.0
+weasyprint==61.2
+pytz==2023.3
+Werkzeug==2.3.7
+python-dotenv==1.0.0
+wtforms_sqlalchemy==0.3

@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Activity Report - {{ residente.nome }}</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&family=Merriweather:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      @page {
+        size: A4;
+        margin: 2.5cm 2cm;
+        @top-center {
+          content: "Medical Residency Activity Report";
+          font-family: "Roboto", Arial, sans-serif;
+          font-size: 9.5pt;
+          color: #555;
+          border-bottom: 0.5px solid #ddd;
+          width: 100%;
+          padding-bottom: 7px;
+        }
+        @bottom-right {
+          content: "Page " counter(page) " of " counter(pages);
+          font-family: "Roboto", Arial, sans-serif;
+          font-size: 9.5pt;
+          color: #555;
+        }
+      }
+      body {
+        font-family: "Roboto", sans-serif;
+        font-size: 10.5pt;
+        line-height: 1.7;
+        color: #333;
+        margin: 0;
+        padding: 0;
+      }
+      .container {
+        width: 100%;
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+      }
+      .main-header {
+        text-align: center;
+        margin-bottom: 40px;
+        padding-bottom: 15px;
+        border-bottom: 1px solid #eee;
+      }
+      .main-header h1 {
+        font-family: "Merriweather", serif;
+        font-size: 24pt;
+        margin: 0;
+        font-weight: 700;
+        color: #002b4c;
+        letter-spacing: -0.5px;
+      }
+      .main-header p.subtitle {
+        font-size: 14pt;
+        color: #003d66;
+        margin-top: 5px;
+        font-weight: 400;
+      }
+      h2.section-title {
+        font-family: "Roboto", sans-serif;
+        font-size: 15pt;
+        font-weight: 700;
+        color: #003d66;
+        border-bottom: 2px solid #005f99;
+        padding-bottom: 8px;
+        margin-top: 45px;
+        margin-bottom: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+      .info-block p {
+        margin: 7px 0;
+        font-size: 10.5pt;
+      }
+      .info-block p strong {
+        color: #003d66;
+      }
+      .declaracao {
+        margin: 35px 0;
+        text-align: justify;
+        background-color: #f8fbfd;
+        border-left: 5px solid #005f99;
+        padding: 15px 20px;
+        border-radius: 4px;
+        font-size: 10.5pt;
+        color: #444;
+      }
+      .descricao-bloco {
+        background-color: #f9fbfd;
+        border: 1px solid #dce7f1;
+        border-radius: 5px;
+        padding: 15px 18px;
+        margin-bottom: 18px;
+      }
+      .descricao-titulo {
+        font-weight: 700;
+        color: #003d66;
+        margin-bottom: 8px;
+        font-size: 10.5pt;
+        font-family: "Roboto", sans-serif;
+        border-bottom: 1px dashed #aac8e0;
+        padding-bottom: 4px;
+      }
+      .descricao-conteudo {
+        font-size: 10pt;
+        line-height: 1.6;
+        color: #444;
+        white-space: pre-line;
+      }
+
+      /* Estilos para campos detalhados */
+      .procedimento-detalhado {
+        margin-bottom: 25px;
+      }
+      .campo-detalhado {
+        background-color: #fafbfc;
+        border: 1px solid #e1e8f0;
+        border-radius: 4px;
+        padding: 12px 15px;
+        margin-bottom: 15px;
+      }
+      .campo-titulo {
+        font-weight: 700;
+        color: #003d66;
+        margin-bottom: 6px;
+        font-size: 10pt;
+        font-family: "Roboto", sans-serif;
+        display: flex;
+        align-items: center;
+      }
+      .campo-titulo .icone {
+        margin-right: 6px;
+        font-size: 11pt;
+        color: #005f99;
+      }
+      .campo-conteudo {
+        font-size: 9.5pt;
+        line-height: 1.5;
+        color: #444;
+        white-space: pre-line;
+        margin-left: 15px;
+      }
+      .campo-opcional {
+        border-left: 3px solid #ffa500;
+        background-color: #fffaf0;
+      }
+      .campo-obrigatorio {
+        border-left: 3px solid #005f99;
+      }
+      .procedure-item {
+        border: 1px solid #e9e9e9;
+        border-radius: 6px;
+        padding: 20px;
+        margin-bottom: 30px;
+        background-color: #fff;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.03);
+      }
+      .procedure-item h3 {
+        font-family: "Merriweather", serif;
+        font-size: 14pt;
+        margin-top: 0;
+        margin-bottom: 12px;
+        color: #003366;
+        border-bottom: 1px dotted #e0e0e0;
+        padding-bottom: 8px;
+      }
+      .procedure-item .meta-info {
+        font-size: 9.5pt;
+        color: #666;
+        margin-bottom: 18px;
+        line-height: 1.4;
+      }
+      .procedure-item .meta-info strong {
+        color: #003d66;
+      }
+      .procedure-item blockquote {
+        background-color: #f0f6fa;
+        border-left: 4px solid #005f99;
+        margin: 18px 0 18px 0;
+        padding: 12px 20px;
+        font-style: italic;
+        color: #4a4a4a;
+        border-radius: 3px;
+        font-size: 10pt;
+      }
+      .procedure-item blockquote strong {
+        display: block;
+        margin-bottom: 8px;
+        color: #003d66;
+        font-size: 10.5pt;
+        font-style: normal;
+      }
+      .summary {
+        margin-top: 50px;
+        padding: 20px;
+        text-align: center;
+        font-size: 14pt;
+        font-weight: 700;
+        background-color: #e6f0f5;
+        border: 1px solid #cce0eb;
+        border-radius: 5px;
+        color: #003d66;
+      }
+      .signatures {
+        margin-top: 80px;
+        display: flex;
+        justify-content: space-around;
+        text-align: center;
+        flex-wrap: wrap;
+      }
+      .signature-block {
+        width: 45%;
+        max-width: 380px;
+        margin: 0 15px;
+      }
+      .signature-line {
+        border-top: 1px solid #999;
+        margin-top: 60px;
+        padding-top: 8px;
+        font-size: 10.5pt;
+        color: #333;
+      }
+      .signature-line strong {
+        display: block;
+        margin-bottom: 3px;
+        font-size: 11.5pt;
+        color: #003d66;
+      }
+      .footer-info {
+        text-align: center;
+        margin-top: 70px;
+        font-size: 9.5pt;
+        color: #888;
+        padding-top: 15px;
+        border-top: 0.5px solid #eee;
+      }
+      @media screen and (max-width: 768px) {
+        body {
+          font-size: 10pt;
+        }
+        .main-header h1 {
+          font-size: 20pt;
+        }
+        h2.section-title {
+          font-size: 13pt;
+        }
+        .declaracao,
+        .procedure-item,
+        .summary {
+          padding: 15px;
+        }
+        .signatures {
+          flex-direction: column;
+          align-items: center;
+        }
+        .signature-block {
+          width: 90%;
+          margin-bottom: 40px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <header class="main-header">
+        <h1>Medical Residency Logbook</h1>
+        <p class="subtitle">Medical Residency Program Coordination</p>
+      </header>
+
+      <h2
+        style="
+          text-align: center;
+          font-size: 18pt;
+          color: #002b4c;
+          margin-top: 0;
+          margin-bottom: 5px !important;
+        "
+      >
+        VALIDATED PROCEDURES REPORT
+      </h2>
+
+      <section class="info-block">
+        <h2 class="section-title">Resident Identification</h2>
+        <p><strong>Resident:</strong> {{ residente.nome }}</p>
+        <p>
+          <strong>CRM:</strong> {{ residente.crm_numero }}/{{ residente.crm_uf
+          }}
+        </p>
+        <p>
+          <strong>Program:</strong> Medical Residency in {{
+          residente.especialidade.nome }}, Category {{ residente.categoria }}
+        </p>
+        <p><strong>Year of Admission:</strong> {{ residente.ano_ingresso }}</p>
+        <p>
+          <strong>Institution:</strong> {{
+          residente.supervisor.universidade.nome }} - {{
+          residente.supervisor.hospital.nome }}
+        </p>
+        <p><strong>Main Supervisor:</strong> {{ residente.supervisor.nome }}</p>
+      </section>
+
+      {% if total_geral > 0 %}
+      <section class="info-block">
+        <h2 class="section-title">Statistical Summary</h2>
+        <div
+          style="
+            background-color: #f8fbfd;
+            border: 1px solid #dce7f1;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+          "
+        >
+          <div
+            style="
+              display: flex;
+              justify-content: space-around;
+              flex-wrap: wrap;
+              text-align: center;
+            "
+          >
+            <div style="margin: 10px">
+              <div style="font-size: 24pt; font-weight: bold; color: #28a745">
+                {{ total_procedimentos }}
+              </div>
+              <div style="font-size: 10pt; color: #666">Validated</div>
+              <div style="font-size: 9pt; color: #888">
+                {{ "%.1f"|format((total_procedimentos/total_geral*100) if
+                total_geral > 0 else 0) }}%
+              </div>
+            </div>
+            <div style="margin: 10px">
+              <div style="font-size: 24pt; font-weight: bold; color: #ffc107">
+                {{ procedimentos_pendentes }}
+              </div>
+              <div style="font-size: 10pt; color: #666">Pending</div>
+              <div style="font-size: 9pt; color: #888">
+                {{ "%.1f"|format((procedimentos_pendentes/total_geral*100) if
+                total_geral > 0 else 0) }}%
+              </div>
+            </div>
+            <div style="margin: 10px">
+              <div style="font-size: 24pt; font-weight: bold; color: #dc3545">
+                {{ procedimentos_rejeitados }}
+              </div>
+              <div style="font-size: 10pt; color: #666">Rejected</div>
+              <div style="font-size: 9pt; color: #888">
+                {{ "%.1f"|format((procedimentos_rejeitados/total_geral*100) if
+                total_geral > 0 else 0) }}%
+              </div>
+            </div>
+            <div style="margin: 10px">
+              <div style="font-size: 24pt; font-weight: bold; color: #003366">
+                {{ total_geral }}
+              </div>
+              <div style="font-size: 10pt; color: #666">Total Registered</div>
+              <div style="font-size: 9pt; color: #888">100.0%</div>
+            </div>
+          </div>
+        </div>
+      </section>
+      {% endif %} {% if preceptores_stats %}
+      <section class="info-block">
+        <h2 class="section-title">Distribution by Preceptor</h2>
+        <div
+          style="
+            background-color: #f0f6fa;
+            border: 1px solid #cce0eb;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+          "
+        >
+          {% for preceptor, count in preceptores_stats.most_common() %}
+          <div
+            style="
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+              padding: 8px 0;
+              border-bottom: 1px solid #e0e0e0;
+            "
+          >
+            <span style="font-weight: bold; color: #003366"
+              >{{ preceptor }}</span
+            >
+            <span
+              style="
+                background-color: #005f99;
+                color: white;
+                padding: 4px 12px;
+                border-radius: 15px;
+                font-size: 9pt;
+              "
+            >
+              {{ count }} procedure{{ 's' if count != 1 else '' }} ({{
+              "%.1f"|format((count/total_procedimentos*100) if
+              total_procedimentos > 0 else 0) }}%)
+            </span>
+          </div>
+          {% endfor %}
+        </div>
+      </section>
+      {% endif %}
+
+      <div class="declaracao">
+        <p>
+          We hereby declare that the above-mentioned resident physician has
+          performed the following procedures and activities, which were duly
+          supervised and validated by the responsible preceptors, as detailed
+          below.
+        </p>
+      </div>
+
+      <section style="overflow: hidden">
+        <h2 class="section-title">List of Validated Procedures</h2>
+
+        {% if procedimentos %} {% for proc in procedimentos %}
+        <article class="procedure-item">
+          <h3>{{ loop.index }}. {{ proc.nome_procedimento }}</h3>
+          <p class="meta-info">
+            <strong>Date Performed:</strong> {{
+            proc.data_realizacao.strftime('%d/%m/%Y') }} <br />
+            <strong>Validating Preceptor:</strong> {{ proc.preceptor.nome }}
+          </p>
+
+          <!-- Metodologia HEIPOC -->
+          <div class="procedimento-detalhado">
+            {% if proc.historia_clinica %}
+            <div class="campo-detalhado campo-obrigatorio">
+              <div class="campo-titulo">
+                <span class="icone">📋</span>
+                H - História Clínica
+              </div>
+              <div class="campo-conteudo">{{ proc.historia_clinica }}</div>
+            </div>
+            {% endif %} {% if proc.exame_fisico %}
+            <div class="campo-detalhado campo-obrigatorio">
+              <div class="campo-titulo">
+                <span class="icone">🔍</span>
+                E - Exame Físico
+              </div>
+              <div class="campo-conteudo">{{ proc.exame_fisico }}</div>
+            </div>
+            {% endif %} {% if proc.interpretacao_diagnostico %}
+            <div class="campo-detalhado campo-obrigatorio">
+              <div class="campo-titulo">
+                <span class="icone">🧠</span>
+                I - Interpretação e Diagnósticos
+              </div>
+              <div class="campo-conteudo">
+                {{ proc.interpretacao_diagnostico }}
+              </div>
+            </div>
+            {% endif %} {% if proc.plano_terapeutico %}
+            <div class="campo-detalhado campo-obrigatorio">
+              <div class="campo-titulo">
+                <span class="icone">⚕️</span>
+                P - Plano Terapêutico
+              </div>
+              <div class="campo-conteudo">{{ proc.plano_terapeutico }}</div>
+            </div>
+            {% endif %} {% if proc.orientacao_paciente %}
+            <div class="campo-detalhado campo-obrigatorio">
+              <div class="campo-titulo">
+                <span class="icone">�</span>
+                O - Orientação ao Paciente
+              </div>
+              <div class="campo-conteudo">{{ proc.orientacao_paciente }}</div>
+            </div>
+            {% endif %} {% if proc.conhecimento_aprendizagem %}
+            <div class="campo-detalhado campo-obrigatorio">
+              <div class="campo-titulo">
+                <span class="icone">�</span>
+                C - Conhecimento e Aprendizagem
+              </div>
+              <div class="campo-conteudo">
+                {{ proc.conhecimento_aprendizagem }}
+              </div>
+            </div>
+            {% endif %}
+          </div>
+
+          {% if proc.observacao_preceptor %}
+          <blockquote>
+            <strong>Preceptor's Remarks:</strong>
+            {{ proc.observacao_preceptor }}
+          </blockquote>
+          {% endif %}
+        </article>
+        {% endfor %}
+
+        <div class="summary">
+          Total Validated Procedures in This Report: {{ procedimentos|length }}
+        </div>
+        {% else %}
+        <p>No validated procedures found for the period of this report.</p>
+        {% endif %}
+      </section>
+
+      <section class="info-block">
+        <h2 class="section-title">General Remarks</h2>
+        <div class="declaracao">
+          <p>
+            This report presents a complete summary of the activities performed
+            by resident
+            <strong>{{ residente.nome }}</strong> in the Medical Residency
+            Program in <strong>{{ residente.especialidade.nome }}</strong>.
+          </p>
+
+          <p>
+            The analyzed period demonstrates the resident's commitment and
+            progress in the specialty's practical activities, with
+            <strong
+              >{{ total_procedimentos }} validated procedure{{ 's' if
+              total_procedimentos != 1 else '' }}</strong
+            >
+            by the responsible preceptors.
+          </p>
+
+          <p>
+            Proper supervision and systematic recording of activities are
+            essential to ensure the quality of the specialized medical training
+            provided by the institution.
+          </p>
+
+          <p>
+            <em
+              >Document automatically generated by the Electronic Logbook System
+              on {{ data_emissao.strftime('%d/%m/%Y at %H:%M') }}.</em
+            >
+          </p>
+        </div>
+      </section>
+
+      <footer class="signatures">
+        <div class="signature-block">
+          <div class="signature-line">
+            <strong>{{ residente.nome }}</strong>
+            Resident Physician
+          </div>
+        </div>
+        <div class="signature-block">
+          <div class="signature-line">
+            <strong>{{ residente.supervisor.nome }}</strong>
+            Program Supervisor
+          </div>
+        </div>
+      </footer>
+
+      <div class="footer-info">{{ data_emissao.strftime('%B %d, %Y') }}.</div>
+    </div>
+  </body>
+</html>

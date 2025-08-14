@@ -11,7 +11,7 @@ O **Logbook do Residente** é uma aplicação desenvolvida para facilitar o regi
 O sistema implementa os 6 campos obrigatórios da metodologia oficial:
 
 - **H** - História Clínica
-- **E** - Exame Físico  
+- **E** - Exame Físico
 - **I** - Interpretação e Diagnósticos
 - **P** - Plano Terapêutico
 - **O** - Orientação ao Paciente
@@ -20,6 +20,7 @@ O sistema implementa os 6 campos obrigatórios da metodologia oficial:
 ## ⚡ Funcionalidades
 
 ### 👨‍⚕️ Para Residentes:
+
 - ✅ Registro estruturado de procedimentos usando metodologia HEIPOC
 - ✅ Validação de campos obrigatórios com tamanhos mínimos
 - ✅ Visualização do histórico de procedimentos
@@ -27,6 +28,7 @@ O sistema implementa os 6 campos obrigatórios da metodologia oficial:
 - ✅ Interface intuitiva com accordion organizado
 
 ### 👩‍⚕️ Para Preceptores:
+
 - ✅ Avaliação detalhada de procedimentos pendentes
 - ✅ Visualização completa da metodologia HEIPOC
 - ✅ Sistema de validação/rejeição com observações
@@ -34,6 +36,7 @@ O sistema implementa os 6 campos obrigatórios da metodologia oficial:
 - ✅ Geração de relatórios em PDF
 
 ### 🔐 Sistema de Autenticação:
+
 - ✅ Login seguro para residentes e preceptores
 - ✅ Verificação de CRM para preceptores
 - ✅ Cadastro de novos usuários
@@ -53,18 +56,21 @@ O sistema implementa os 6 campos obrigatórios da metodologia oficial:
 ## 📦 Instalação
 
 ### Pré-requisitos
+
 - Python 3.8+
 - Git
 
 ### Passos para instalação:
 
 1. **Clone o repositório:**
+
 ```bash
 git clone [URL_DO_REPOSITORIO]
 cd "LOGBOOK DO RESIDENTE"
 ```
 
 2. **Crie e ative o ambiente virtual:**
+
 ```bash
 python -m venv .venv
 # Windows
@@ -74,12 +80,14 @@ source .venv/bin/activate
 ```
 
 3. **Instale as dependências:**
+
 ```bash
 pip install -r requirements.txt
 ```
 
 4. **Configure as variáveis de ambiente:**
-Crie um arquivo `.env` na raiz do projeto:
+   Crie um arquivo `.env` na raiz do projeto:
+
 ```env
 SECRET_KEY=sua_chave_secreta_aqui
 MAIL_SERVER=smtp.gmail.com
@@ -90,21 +98,24 @@ MAIL_PASSWORD=sua_senha_app
 ```
 
 5. **Execute a aplicação:**
+
 ```bash
 python run.py
 ```
 
 6. **Acesse o sistema:**
-Abra o navegador em `http://localhost:5000`
+   Abra o navegador em `http://localhost:5000`
 
 ## 🗄️ Estrutura do Banco de Dados
 
 ### Tabelas Principais:
+
 - **Residente:** Dados dos residentes
-- **Preceptor:** Dados dos preceptores  
+- **Preceptor:** Dados dos preceptores
 - **Procedimento:** Registros HEIPOC dos procedimentos
 
 ### Campos HEIPOC no Procedimento:
+
 - `historia_clinica` (TEXT, obrigatório)
 - `exame_fisico` (TEXT, obrigatório)
 - `interpretacao_diagnostico` (TEXT, obrigatório)
@@ -115,6 +126,7 @@ Abra o navegador em `http://localhost:5000`
 ## 🎨 Interface
 
 ### Design System:
+
 - **Framework:** Bootstrap 5
 - **Ícones:** Bootstrap Icons
 - **Cores:** Paleta médica profissional (#003366)
@@ -122,6 +134,7 @@ Abra o navegador em `http://localhost:5000`
 - **Responsividade:** Mobile-first design
 
 ### Validação Frontend:
+
 - **Campos obrigatórios:** Validação em tempo real
 - **Tamanhos mínimos:** História (10 chars), outros campos (10+ chars)
 - **Feedback visual:** Mensagens de erro em português
@@ -130,6 +143,7 @@ Abra o navegador em `http://localhost:5000`
 ## 📊 Relatórios
 
 ### Geração de PDF:
+
 - **Metodologia HEIPOC** completa formatada
 - **Dados do residente** e preceptor
 - **Status de validação** com timestamp
@@ -138,7 +152,7 @@ Abra o navegador em `http://localhost:5000`
 ## 🔒 Segurança
 
 - ✅ **Hash de senhas** com Werkzeug
-- ✅ **CSRF Protection** com Flask-WTF  
+- ✅ **CSRF Protection** com Flask-WTF
 - ✅ **Session Management** com Flask-Login
 - ✅ **Validação de entrada** em todos os formulários
 - ✅ **Controle de acesso** baseado em roles
@@ -146,6 +160,7 @@ Abra o navegador em `http://localhost:5000`
 ## 🚀 Deploy
 
 ### Variáveis de Ambiente Necessárias:
+
 ```env
 SECRET_KEY=chave_secreta_producao
 MAIL_SERVER=servidor_smtp

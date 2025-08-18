@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Activity Report - {{ residente.nome }}</title>
+    <title>Relatório de Atividades - {{ residente.nome }}</title>
     <link
       href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&family=Merriweather:wght@400;700&display=swap"
       rel="stylesheet"
@@ -13,7 +13,7 @@
         size: A4;
         margin: 2.5cm 2cm;
         @top-center {
-          content: "Medical Residency Activity Report";
+          content: "Relatório de Atividades da Residência Médica";
           font-family: "Roboto", Arial, sans-serif;
           font-size: 9.5pt;
           color: #555;
@@ -22,7 +22,7 @@
           padding-bottom: 7px;
         }
         @bottom-right {
-          content: "Page " counter(page) " of " counter(pages);
+          content: "Página " counter(page) " de " counter(pages);
           font-family: "Roboto", Arial, sans-serif;
           font-size: 9.5pt;
           color: #555;
@@ -269,8 +269,8 @@
   <body>
     <div class="container">
       <header class="main-header">
-        <h1>Medical Residency Logbook</h1>
-        <p class="subtitle">Medical Residency Program Coordination</p>
+        <h1>Logbook da Residência Médica</h1>
+        <p class="subtitle">Coordenação do Programa de Residência Médica</p>
       </header>
 
       <h2
@@ -282,32 +282,34 @@
           margin-bottom: 5px !important;
         "
       >
-        VALIDATED PROCEDURES REPORT
+        RELATÓRIO DE PROCEDIMENTOS VALIDADOS
       </h2>
 
       <section class="info-block">
-        <h2 class="section-title">Resident Identification</h2>
-        <p><strong>Resident:</strong> {{ residente.nome }}</p>
+        <h2 class="section-title">Identificação do Residente</h2>
+        <p><strong>Residente:</strong> {{ residente.nome }}</p>
         <p>
           <strong>CRM:</strong> {{ residente.crm_numero }}/{{ residente.crm_uf
           }}
         </p>
         <p>
-          <strong>Program:</strong> Medical Residency in {{
-          residente.especialidade.nome }}, Category {{ residente.categoria }}
+          <strong>Programa:</strong> Residência Médica em {{
+          residente.especialidade.nome }}, Categoria {{ residente.categoria }}
         </p>
-        <p><strong>Year of Admission:</strong> {{ residente.ano_ingresso }}</p>
+        <p><strong>Ano de Ingresso:</strong> {{ residente.ano_ingresso }}</p>
         <p>
-          <strong>Institution:</strong> {{
+          <strong>Instituição:</strong> {{
           residente.supervisor.universidade.nome }} - {{
           residente.supervisor.hospital.nome }}
         </p>
-        <p><strong>Main Supervisor:</strong> {{ residente.supervisor.nome }}</p>
+        <p>
+          <strong>Supervisor Principal:</strong> {{ residente.supervisor.nome }}
+        </p>
       </section>
 
       {% if total_geral > 0 %}
       <section class="info-block">
-        <h2 class="section-title">Statistical Summary</h2>
+        <h2 class="section-title">Resumo Estatístico</h2>
         <div
           style="
             background-color: #f8fbfd;
@@ -329,7 +331,7 @@
               <div style="font-size: 24pt; font-weight: bold; color: #28a745">
                 {{ total_procedimentos }}
               </div>
-              <div style="font-size: 10pt; color: #666">Validated</div>
+              <div style="font-size: 10pt; color: #666">Validados</div>
               <div style="font-size: 9pt; color: #888">
                 {{ "%.1f"|format((total_procedimentos/total_geral*100) if
                 total_geral > 0 else 0) }}%
@@ -339,7 +341,7 @@
               <div style="font-size: 24pt; font-weight: bold; color: #ffc107">
                 {{ procedimentos_pendentes }}
               </div>
-              <div style="font-size: 10pt; color: #666">Pending</div>
+              <div style="font-size: 10pt; color: #666">Pendentes</div>
               <div style="font-size: 9pt; color: #888">
                 {{ "%.1f"|format((procedimentos_pendentes/total_geral*100) if
                 total_geral > 0 else 0) }}%
@@ -349,7 +351,7 @@
               <div style="font-size: 24pt; font-weight: bold; color: #dc3545">
                 {{ procedimentos_rejeitados }}
               </div>
-              <div style="font-size: 10pt; color: #666">Rejected</div>
+              <div style="font-size: 10pt; color: #666">Rejeitados</div>
               <div style="font-size: 9pt; color: #888">
                 {{ "%.1f"|format((procedimentos_rejeitados/total_geral*100) if
                 total_geral > 0 else 0) }}%
@@ -359,7 +361,7 @@
               <div style="font-size: 24pt; font-weight: bold; color: #003366">
                 {{ total_geral }}
               </div>
-              <div style="font-size: 10pt; color: #666">Total Registered</div>
+              <div style="font-size: 10pt; color: #666">Total Registrado</div>
               <div style="font-size: 9pt; color: #888">100.0%</div>
             </div>
           </div>
@@ -367,7 +369,7 @@
       </section>
       {% endif %} {% if preceptores_stats %}
       <section class="info-block">
-        <h2 class="section-title">Distribution by Preceptor</h2>
+        <h2 class="section-title">Distribuição por Preceptor</h2>
         <div
           style="
             background-color: #f0f6fa;
@@ -399,7 +401,7 @@
                 font-size: 9pt;
               "
             >
-              {{ count }} procedure{{ 's' if count != 1 else '' }} ({{
+              {{ count }} procedimento{{ 's' if count != 1 else '' }} ({{
               "%.1f"|format((count/total_procedimentos*100) if
               total_procedimentos > 0 else 0) }}%)
             </span>
@@ -411,23 +413,22 @@
 
       <div class="declaracao">
         <p>
-          We hereby declare that the above-mentioned resident physician has
-          performed the following procedures and activities, which were duly
-          supervised and validated by the responsible preceptors, as detailed
-          below.
+          Declaramos que o médico residente supracitado realizou os seguintes
+          procedimentos e atividades, que foram devidamente supervisionados e
+          validados pelos preceptores responsáveis, conforme detalhado abaixo.
         </p>
       </div>
 
       <section style="overflow: hidden">
-        <h2 class="section-title">List of Validated Procedures</h2>
+        <h2 class="section-title">Lista de Procedimentos Validados</h2>
 
         {% if procedimentos %} {% for proc in procedimentos %}
         <article class="procedure-item">
           <h3>{{ loop.index }}. {{ proc.nome_procedimento }}</h3>
           <p class="meta-info">
-            <strong>Date Performed:</strong> {{
+            <strong>Data de Realização:</strong> {{
             proc.data_realizacao.strftime('%d/%m/%Y') }} <br />
-            <strong>Validating Preceptor:</strong> {{ proc.preceptor.nome }}
+            <strong>Preceptor Validador:</strong> {{ proc.preceptor.nome }}
           </p>
 
           <!-- Metodologia HEIPOC -->
@@ -489,7 +490,7 @@
 
           {% if proc.observacao_preceptor %}
           <blockquote>
-            <strong>Preceptor's Remarks:</strong>
+            <strong>Observações do Preceptor:</strong>
             {{ proc.observacao_preceptor }}
           </blockquote>
           {% endif %}
@@ -497,43 +498,49 @@
         {% endfor %}
 
         <div class="summary">
-          Total Validated Procedures in This Report: {{ procedimentos|length }}
+          Total de Procedimentos Validados neste Relatório: {{
+          procedimentos|length }}
         </div>
         {% else %}
-        <p>No validated procedures found for the period of this report.</p>
+        <p>
+          Nenhum procedimento validado encontrado para o período deste
+          relatório.
+        </p>
         {% endif %}
       </section>
 
       <section class="info-block">
-        <h2 class="section-title">General Remarks</h2>
+        <h2 class="section-title">Considerações Gerais</h2>
         <div class="declaracao">
           <p>
-            This report presents a complete summary of the activities performed
-            by resident
-            <strong>{{ residente.nome }}</strong> in the Medical Residency
-            Program in <strong>{{ residente.especialidade.nome }}</strong>.
+            Este relatório apresenta um resumo completo das atividades
+            realizadas pelo residente
+            <strong>{{ residente.nome }}</strong> no Programa de Residência
+            Médica em <strong>{{ residente.especialidade.nome }}</strong>.
           </p>
 
           <p>
-            The analyzed period demonstrates the resident's commitment and
-            progress in the specialty's practical activities, with
+            O período analisado demonstra o comprometimento e o progresso do
+            residente nas atividades práticas da especialidade, com
             <strong
-              >{{ total_procedimentos }} validated procedure{{ 's' if
+              >{{ total_procedimentos }} procedimento{{ 's' if
+              total_procedimentos != 1 else '' }} validado{{ 's' if
               total_procedimentos != 1 else '' }}</strong
             >
-            by the responsible preceptors.
+            pelos preceptores responsáveis.
           </p>
 
           <p>
-            Proper supervision and systematic recording of activities are
-            essential to ensure the quality of the specialized medical training
-            provided by the institution.
+            A supervisão adequada e o registro sistemático das atividades são
+            essenciais para garantir a qualidade da formação médica
+            especializada oferecida pela instituição.
           </p>
 
           <p>
             <em
-              >Document automatically generated by the Electronic Logbook System
-              on {{ data_emissao.strftime('%d/%m/%Y at %H:%M') }}.</em
+              >Documento gerado automaticamente pelo Sistema de Logbook
+              Eletrônico em {{ data_emissao.strftime('%d/%m/%Y às %H:%M')
+              }}.</em
             >
           </p>
         </div>
@@ -543,18 +550,20 @@
         <div class="signature-block">
           <div class="signature-line">
             <strong>{{ residente.nome }}</strong>
-            Resident Physician
+            Médico Residente
           </div>
         </div>
         <div class="signature-block">
           <div class="signature-line">
             <strong>{{ residente.supervisor.nome }}</strong>
-            Program Supervisor
+            Supervisor do Programa
           </div>
         </div>
       </footer>
 
-      <div class="footer-info">{{ data_emissao.strftime('%B %d, %Y') }}.</div>
+      <div class="footer-info">
+        {{ data_emissao.strftime('%d de %B de %Y') }}.
+      </div>
     </div>
   </body>
 </html>

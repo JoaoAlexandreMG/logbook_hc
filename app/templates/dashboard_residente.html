@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>{{ title }} | Resident Logbook System</title>
+    <title>{{ title }} | Sistema Logbook do Residente</title>
     <link
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
       rel="stylesheet"
@@ -128,14 +128,14 @@
     >
       <div class="container">
         <a class="navbar-brand" href="{{ url_for('main.home') }}">
-          <i class="bi bi-journal-check"></i> Resident Logbook
+          <i class="bi bi-journal-check"></i> Logbook do Residente
         </a>
         <div class="d-flex align-items-center">
           <span class="navbar-text me-3 d-none d-sm-block"
-            >Hello, {{ current_user.nome }}</span
+            >Olá, {{ current_user.nome }}</span
           >
           <a href="{{ url_for('main.logout') }}" class="btn btn-outline-light">
-            <i class="bi bi-box-arrow-right"></i> Logout
+            <i class="bi bi-box-arrow-right"></i> Sair
           </a>
         </div>
       </div>
@@ -153,13 +153,13 @@
           type="button"
           class="btn-close"
           data-bs-dismiss="alert"
-          aria-label="Close"
+          aria-label="Fechar"
         ></button>
       </div>
       {% endfor %} {% endif %} {% endwith %}
 
       <div class="page-header mb-4">
-        <h1 class="h2 mb-0">My Procedures</h1>
+        <h1 class="h2 mb-0">Meus Procedimentos</h1>
         <div class="d-flex gap-2">
           <a
             href="{{ url_for('main.gerar_relatorio', residente_id=current_user.id) }}"
@@ -167,7 +167,7 @@
             target="_blank"
           >
             <i class="bi bi-file-earmark-pdf-fill me-2"></i>
-            <span>Generate Report</span>
+            <span>Gerar Relatório</span>
           </a>
           <button
             type="button"
@@ -176,7 +176,7 @@
             data-bs-target="#procedimentoModal"
           >
             <i class="bi bi-plus-circle-fill me-2"></i>
-            <span>Register Procedure</span>
+            <span>Registrar Procedimento</span>
           </button>
         </div>
       </div>
@@ -187,17 +187,17 @@
             <table class="table table-hover align-middle">
               <thead class="table-light">
                 <tr>
-                  <th>Procedure</th>
-                  <th>Date</th>
+                  <th>Procedimento</th>
+                  <th>Data</th>
                   <th>Preceptor</th>
                   <th class="text-center">Status</th>
                 </tr>
               </thead>
               <tbody>
                 {% for proc in procedimentos %} {% set obs_text %} {% if
-                proc.status == 'Pending' %} Awaiting evaluation... {% elif
+                proc.status == 'Pendente' %} Aguardando avaliação... {% elif
                 proc.observacao_preceptor %}{{ proc.observacao_preceptor }} {%
-                else %}No observation was made. {% endif %} {% endset %}
+                else %}Nenhuma observação foi feita. {% endif %} {% endset %}
 
                 <tr
                   data-bs-toggle="modal"
@@ -221,15 +221,15 @@
                     {% if proc.status == 'Pendente' %}
                     <span
                       class="badge rounded-pill bg-warning text-dark status-badge"
-                      >Pending</span
+                      >Pendente</span
                     >
                     {% elif proc.status == 'Validado' %}
                     <span class="badge rounded-pill bg-success status-badge"
-                      >Validated</span
+                      >Validado</span
                     >
                     {% elif proc.status == 'Rejeitado' %}
                     <span class="badge rounded-pill bg-danger status-badge"
-                      >Rejected</span
+                      >Rejeitado</span
                     >
                     {% endif %}
                   </td>
@@ -237,7 +237,7 @@
                 {% else %}
                 <tr>
                   <td colspan="4" class="text-center text-muted py-4">
-                    No procedures registered yet.
+                    Nenhum procedimento registrado ainda.
                   </td>
                 </tr>
                 {% endfor %}
@@ -265,19 +265,19 @@
             {{ form.hidden_tag() }}
             <div class="modal-header">
               <h5 class="modal-title" id="procedimentoModalLabel">
-                Register New Procedure
+                Registrar Novo Procedimento
               </h5>
               <button
                 type="button"
                 class="btn-close"
                 data-bs-dismiss="modal"
-                aria-label="Close"
+                aria-label="Fechar"
               ></button>
             </div>
             <div class="modal-body">
               <div class="mb-3">
                 <label class="form-label" for="nome_procedimento"
-                  >Procedure Name</label
+                  >Nome do Procedimento</label
                 >
                 <input
                   class="form-control form-control-lg"
@@ -291,7 +291,7 @@
                 <div class="col-md-6">
                   <div class="mb-3">
                     <label class="form-label" for="data_realizacao"
-                      >Date of Procedure</label
+                      >Data do Procedimento</label
                     >
                     <div class="input-group">
                       <span class="input-group-text">
@@ -302,7 +302,7 @@
                         class="form-control form-control-lg"
                         id="data_realizacao"
                         name="data_realizacao"
-                        placeholder="Select date"
+                        placeholder="Selecionar data"
                         required
                         readonly
                       />
@@ -312,7 +312,7 @@
                 <div class="col-md-6">
                   <div class="mb-3">
                     <label class="form-label" for="preceptor"
-                      >Responsible Preceptor</label
+                      >Preceptor Responsável</label
                     >
                     {{ form.preceptor(class="form-select form-select-lg") }}
                   </div>
@@ -396,10 +396,10 @@
                 class="btn btn-secondary"
                 data-bs-dismiss="modal"
               >
-                Cancel
+                Cancelar
               </button>
               <button type="submit" class="btn btn-primary" id="submitBtn">
-                <i class="bi bi-check-circle me-2"></i>Register Procedure
+                <i class="bi bi-check-circle me-2"></i>Registrar Procedimento
               </button>
             </div>
           </form>
@@ -419,13 +419,13 @@
         <div class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title" id="detalhesModalLabel">
-              Procedure Details
+              Detalhes do Procedimento
             </h5>
             <button
               type="button"
               class="btn-close"
               data-bs-dismiss="modal"
-              aria-label="Close"
+              aria-label="Fechar"
             ></button>
           </div>
           <div class="modal-body">
@@ -437,7 +437,7 @@
             <div class="row g-2 mb-3">
               <div class="col-sm-6">
                 <div class="bg-light border rounded p-2">
-                  <strong>Date:</strong><br />
+                  <strong>Data:</strong><br />
                   <span id="modal-detalhe-data"></span>
                 </div>
               </div>
@@ -461,7 +461,7 @@
             <hr class="my-3" />
 
             <div class="procedure-details">
-              <p class="mb-3 fw-semibold">Detailed Procedure Report:</p>
+              <p class="mb-3 fw-semibold">Relatório Detalhado do Procedimento:</p>
 
               <div class="accordion" id="procedureAccordion">
                 <div class="accordion-item">
@@ -611,7 +611,7 @@
               </div>
             </div>
 
-            <p class="mb-1 fw-semibold mt-4">Preceptor's Observations:</p>
+            <p class="mb-1 fw-semibold mt-4">Observações do Preceptor:</p>
             <div
               class="bg-white border rounded p-3 fw-bold small text-muted"
               id="modal-detalhe-obs"
@@ -623,7 +623,7 @@
               class="btn btn-primary"
               data-bs-dismiss="modal"
             >
-              Close
+              Fechar
             </button>
           </div>
         </div>
@@ -637,7 +637,7 @@
       document.addEventListener("DOMContentLoaded", function () {
         // Configure Flatpickr for date field
         flatpickr("#data_realizacao", {
-          locale: "en",
+          locale: "pt",
           dateFormat: "Y-m-d", // Backend format
           allowInput: false,
           disableMobile: "true",
@@ -646,7 +646,7 @@
           theme: "material_blue",
           clickOpens: true,
           altInput: true, // Show user-friendly format
-          altFormat: "m/d/Y", // Format shown to user
+          altFormat: "d/m/Y", // Format shown to user
         });
 
         // Add form validation

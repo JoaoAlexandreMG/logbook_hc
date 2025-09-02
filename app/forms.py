@@ -42,57 +42,57 @@ def especialidade_query():
 
 
 class RegistroForm(FlaskForm):
-    nome = StringField("Full Name", validators=[DataRequired(), Length(max=150)])
+    nome = StringField("Nome Completo", validators=[DataRequired(), Length(max=150)])
     email = StringField("Email", validators=[DataRequired(), Email()])
-    celular = StringField("Phone Number", validators=[DataRequired()])
+    celular = StringField("Número de Celular", validators=[DataRequired()])
     cpf = StringField("CPF", validators=[DataRequired()])
     instituicao = StringField(
-        "Educational Institution",
-        default="Federal University of Uberlândia",
+        "Instituição de Ensino",
+        default="Universidade Federal de Uberlândia",
         render_kw={"readonly": True},
     )
     hospital = StringField("Hospital", default="HC-UFU", render_kw={"readonly": True})
     # ADICIONE este novo campo no lugar:
 
     especialidade = QuerySelectField(
-        "Residency Specialty",
+        "Especialidade da Residência",
         query_factory=especialidade_query,
         get_label="nome",
         allow_blank=True,
-        blank_text="-- Select your specialty --",
+        blank_text="-- Selecione sua especialidade --",
         validators=[DataRequired()],
     )
     supervisor = QuerySelectField(
-        "Select your Supervisor",
+        "Selecione seu Supervisor",
         query_factory=preceptor_query,
         get_label="nome",
         allow_blank=True,
-        blank_text="-- Select a supervisor --",
+        blank_text="-- Selecione um supervisor --",
         validators=[DataRequired()],
     )
-    ano_ingresso = StringField("Admission Year", validators=[DataRequired()])
+    ano_ingresso = StringField("Ano de Ingresso", validators=[DataRequired()])
     categoria = SelectField(
-        "Category",
+        "Categoria",
         choices=[("R1", "R1"), ("R2", "R2"), ("R3", "R3"), ("R4", "R4"), ("R+", "R+")],
         validators=[DataRequired()],
     )
     password = PasswordField(
-        "Create a Password", validators=[DataRequired(), Length(min=8)]
+        "Criar uma Senha", validators=[DataRequired(), Length(min=8)]
     )
     confirm_password = PasswordField(
-        "Confirm Password",
+        "Confirmar Senha",
         validators=[
             DataRequired(),
-            EqualTo("password", message="Passwords must match."),
+            EqualTo("password", message="As senhas devem coincidir."),
         ],
     )
-    submit = SubmitField("Complete Registration")
+    submit = SubmitField("Finalizar Cadastro")
 
 
 class LoginForm(FlaskForm):
     email = StringField("Email", validators=[DataRequired(), Email()])
-    password = PasswordField("Password", validators=[DataRequired(), Length(min=6)])
-    submit = SubmitField("Login")
+    password = PasswordField("Senha", validators=[DataRequired(), Length(min=6)])
+    submit = SubmitField("Entrar")
 
 
 class ProcedimentoForm(FlaskForm):
@@ -165,52 +165,52 @@ class ProcedimentoForm(FlaskForm):
 class AvaliacaoForm(FlaskForm):
     procedimento_id = HiddenField(validators=[DataRequired()])
     observacao = TextAreaField(
-        "Observations / Justification", validators=[Optional(), Length(max=5000)]
+        "Observações / Justificativa", validators=[Optional(), Length(max=5000)]
     )
-    validar = SubmitField("Validate Procedure")
-    rejeitar = SubmitField("Reject Procedure")
+    validar = SubmitField("Validar Procedimento")
+    rejeitar = SubmitField("Rejeitar Procedimento")
 
 
 class RegistroPreceptorForm(FlaskForm):
-    nome = StringField("Full Name", validators=[DataRequired(), Length(max=150)])
+    nome = StringField("Nome Completo", validators=[DataRequired(), Length(max=150)])
     email = StringField("Email", validators=[DataRequired(), Email()])
-    celular = StringField("Phone Number", validators=[DataRequired()])
+    celular = StringField("Número de Celular", validators=[DataRequired()])
     cpf = StringField("CPF", validators=[DataRequired()])
 
     # --- ALTERAÇÃO AQUI ---
     # Troca dos campos de texto por campos de seleção
     instituicao = StringField(
-        "Higher Education Institution",
-        default="Federal University of Uberlândia",
+        "Instituição de Ensino Superior",
+        default="Universidade Federal de Uberlândia",
         render_kw={"readonly": True},
     )
     hospital = StringField(
-        "Main Hospital",
+        "Hospital Principal",
         default="Hospital de Clínicas de Uberlândia (HC-UFU)",
         render_kw={"readonly": True},
     )
     # O campo UF foi removido do formulário, pois agora está atrelado à universidade.
 
     supervisor = QuerySelectField(
-        "Primary Specialty",
+        "Especialidade Principal",
         query_factory=especialidade_query,
         get_label="nome",
         allow_blank=True,
-        blank_text="-- Select your specialty --",
+        blank_text="-- Selecione sua especialidade --",
         validators=[DataRequired()],
     )
 
     password = PasswordField(
-        "Create a Password", validators=[DataRequired(), Length(min=8)]
+        "Criar uma Senha", validators=[DataRequired(), Length(min=8)]
     )
     confirm_password = PasswordField(
-        "Confirm Password",
+        "Confirmar Senha",
         validators=[
             DataRequired(),
-            EqualTo("password", message="Passwords must match."),
+            EqualTo("password", message="As senhas devem coincidir."),
         ],
     )
-    submit = SubmitField("Complete Registration")
+    submit = SubmitField("Finalizar Cadastro")
 
 
 class VerificacaoCRMForm(FlaskForm):
@@ -243,6 +243,8 @@ class VerificacaoCRMForm(FlaskForm):
         ("SE", "SE"),
         ("TO", "TO"),
     ]
-    uf = SelectField("State (UF)", choices=ufs, validators=[DataRequired()])
-    crm = StringField("CRM Number", validators=[DataRequired(), Length(min=1, max=10)])
-    submit = SubmitField("Verify CRM")
+    uf = SelectField("Estado (UF)", choices=ufs, validators=[DataRequired()])
+    crm = StringField(
+        "Número do CRM", validators=[DataRequired(), Length(min=1, max=10)]
+    )
+    submit = SubmitField("Verificar CRM")

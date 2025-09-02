@@ -54,15 +54,15 @@ def login():
             login_user(user)
             return redirect(url_for("main.home"))
         else:
-            flash("Invalid login. Please check your email and password.", "danger")
-    return render_template("login.html", title="Login", form=form)
+            flash("Login inválido. Verifique seu email e senha.", "danger")
+    return render_template("login.html", title="Acesso", form=form)
 
 
 @main_bp.route("/logout")
 @login_required
 def logout():
     logout_user()
-    flash("You have been logged out successfully.", "success")
+    flash("Você saiu com sucesso.", "success")
     return redirect(url_for("main.login"))
 
 
@@ -80,7 +80,7 @@ def home():
 @login_required
 def dashboard_residente():
     if not isinstance(current_user, Residente):
-        flash("Unauthorized access.", "danger")
+        flash("Acesso não autorizado.", "danger")
         return redirect(url_for("main.home"))
     form = ProcedimentoForm()
     if form.validate_on_submit():
@@ -99,12 +99,12 @@ def dashboard_residente():
 
         db.session.add(novo_procedimento)
         db.session.commit()
-        flash("Procedure registered successfully! Awaiting validation.", "success")
+        flash("Procedimento registrado com sucesso! Aguardando validação.", "success")
         return redirect(url_for("main.dashboard_residente"))
 
         db.session.add(novo_procedimento)
         db.session.commit()
-        flash("Procedure registered successfully! Awaiting validation.", "success")
+        flash("Procedimento registrado com sucesso! Aguardando validação.", "success")
         return redirect(url_for("main.dashboard_residente"))
     procedimentos = (
         Procedimento.query.filter_by(residente_id=current_user.id)
@@ -113,7 +113,7 @@ def dashboard_residente():
     )
     return render_template(
         "dashboard_residente.html",
-        title="My Dashboard",
+        title="Meu Dashboard",
         form=form,
         procedimentos=procedimentos,
     )
@@ -123,16 +123,16 @@ def dashboard_residente():
 @login_required
 def dashboard_preceptor():
     if not isinstance(current_user, Preceptor):
-        flash("Unauthorized access.", "danger")
+        flash("Acesso não autorizado.", "danger")
         return redirect(url_for("main.home"))
     form = AvaliacaoForm()
     if form.validate_on_submit():
         procedimento_id = form.procedimento_id.data
         procedimento = db.session.get(Procedimento, procedimento_id)
         if not procedimento:
-            flash("Procedure not found.", "danger")
+            flash("Procedimento não encontrado.", "danger")
         elif procedimento.preceptor_id != current_user.id:
-            flash("You do not have permission to evaluate this procedure.", "danger")
+            flash("Você não tem permissão para avaliar este procedimento.", "danger")
         else:
             procedimento.observacao_preceptor = form.observacao.data
             if form.validar.data:
@@ -141,7 +141,7 @@ def dashboard_preceptor():
                     procedimento.residente, procedimento, "Validado"
                 )
                 flash(
-                    f'Procedure "{procedimento.nome_procedimento}" successfully validated! Email sent to the resident.',
+                    f'Procedimento "{procedimento.nome_procedimento}" validado com sucesso! Email enviado ao residente.',
                     "success",
                 )
             elif form.rejeitar.data:
@@ -150,7 +150,7 @@ def dashboard_preceptor():
                     procedimento.residente, procedimento, "Rejeitado"
                 )
                 flash(
-                    f'Procedure "{procedimento.nome_procedimento}" rejected. Email sent to the resident.',
+                    f'Procedimento "{procedimento.nome_procedimento}" rejeitado. Email enviado ao residente.',
                     "warning",
                 )
             db.session.commit()
@@ -177,7 +177,7 @@ def dashboard_preceptor():
     )
     return render_template(
         "dashboard_preceptor.html",
-        title="Preceptor Dashboard",
+        title="Dashboard do Preceptor",
         pendentes=procedimentos_pendentes,
         avaliados=procedimentos_avaliados,
         residentes=residentes_supervisionados,
@@ -191,22 +191,24 @@ def gerar_relatorio(residente_id):
     residente = db.session.get(Residente, residente_id)
 
     if not residente:
-        flash("Resident not found.", "danger")
+        flash("Residente não encontrado.", "danger")
         return redirect(url_for("main.home"))
 
     if isinstance(current_user, Residente):
         if current_user.id != residente_id:
-            flash("Access denied. You can only access your own report.", "danger")
+            flash(
+                "Acesso negado. Você só pode acessar seu próprio relatório.", "danger"
+            )
             return redirect(url_for("main.dashboard_residente"))
     elif isinstance(current_user, Preceptor):
         if residente.supervisor_id != current_user.id:
             flash(
-                "Access denied. You can only access reports of residents under your supervision.",
+                "Acesso negado. Você só pode acessar relatórios de residentes sob sua supervisão.",
                 "danger",
             )
             return redirect(url_for("main.dashboard_preceptor"))
     else:
-        flash("Access denied.", "danger")
+        flash("Acesso negado.", "danger")
         return redirect(url_for("main.home"))
 
     procedimentos_validados = (
@@ -391,7 +393,7 @@ def gerar_relatorio(residente_id):
 
     except ImportError as e:
         print(f"WeasyPrint not available: {e}")
-        flash("Warning: WeasyPrint is not installed. Viewing as HTML.", "info")
+        flash("Aviso: WeasyPrint não está instalado. Visualizando como HTML.", "info")
         html_renderizado = render_template(
             "relatorio_template.html",
             residente=residente,
@@ -408,7 +410,7 @@ def gerar_relatorio(residente_id):
         return response
     except Exception as e:
         print(f"Error generating PDF: {e}")
-        flash("Error generating PDF. Viewing as HTML.", "warning")
+        flash("Erro ao gerar PDF. Visualizando como HTML.", "warning")
         html_renderizado = render_template(
             "relatorio_template.html",
             residente=residente,
@@ -451,9 +453,9 @@ def verificar_crm():
             response.raise_for_status()
             resultado = response.json()
         except requests.exceptions.RequestException as e:
-            flash(f"Error accessing external API: {str(e)}", "danger")
+            flash(f"Erro ao acessar API externa: {str(e)}", "danger")
             return render_template(
-                "verificar_crm.html", title="Step 1: CRM Verification", form=form
+                "verificar_crm.html", title="Etapa 1: Verificação do CRM", form=form
             )
 
         if resultado and resultado.get("dados"):
@@ -468,22 +470,22 @@ def verificar_crm():
                         "crm": crm,
                     }
                     flash(
-                        "CRM is regular! Please complete your registration.",
+                        "CRM está regular! Por favor, complete seu cadastro.",
                         "success",
                     )
                     return redirect(url_for("main.selecionar_perfil"))
                 else:
                     flash(
-                        f"CRM found, but its status is '{situacao}'. Only regular CRMs can register.",
+                        f"CRM encontrado, mas sua situação é '{situacao}'. Apenas CRMs regulares podem se cadastrar.",
                         "danger",
                     )
             else:
-                flash("CRM not found or invalid. Please try again.", "danger")
+                flash("CRM não encontrado ou inválido. Tente novamente.", "danger")
         else:
-            flash("CRM not found or invalid. Please try again.", "danger")
+            flash("CRM não encontrado ou inválido. Tente novamente.", "danger")
 
     return render_template(
-        "verificar_crm.html", title="Step 1: CRM Verification", form=form
+        "verificar_crm.html", title="Etapa 1: Verificação do CRM", form=form
     )
 
 
@@ -493,10 +495,10 @@ def selecionar_perfil():
         return redirect(url_for("main.home"))
 
     if "crm_verificado" not in session:
-        flash("Please verify your CRM first.", "info")
+        flash("Por favor, verifique seu CRM primeiro.", "info")
         return redirect(url_for("main.verificar_crm"))
 
-    return render_template("selecionar_perfil.html", title="Step 2: Profile Selection")
+    return render_template("selecionar_perfil.html", title="Etapa 2: Seleção de Perfil")
 
 
 @main_bp.route("/registrar", methods=["GET", "POST"])
@@ -504,7 +506,7 @@ def registrar():
     if current_user.is_authenticated:
         return redirect(url_for("main.home"))
     if "crm_verificado" not in session:
-        flash("Please verify your CRM first.", "info")
+        flash("Por favor, verifique seu CRM primeiro.", "info")
         return redirect(url_for("main.verificar_crm"))
 
     form = RegistroForm()
@@ -513,9 +515,9 @@ def registrar():
 
     if form.validate_on_submit():
         if Residente.query.filter_by(email=form.email.data).first():
-            flash("This email is already in use.", "danger")
+            flash("Este email já está em uso.", "danger")
         elif Residente.query.filter_by(cpf=form.cpf.data).first():
-            flash("This CPF is already registered.", "danger")
+            flash("Este CPF já está cadastrado.", "danger")
         else:
             crm_info = session.get("crm_verificado", {})
 
@@ -529,20 +531,20 @@ def registrar():
             if not universidade:
                 universidade = Universidade.query.first()
                 if not universidade:
-                    flash("Error: No university found in the system.", "danger")
+                    flash("Erro: Nenhuma universidade encontrada no sistema.", "danger")
                     return render_template(
                         "registrar.html",
-                        title="Complete Registration: Resident",
+                        title="Finalizar Cadastro: Residente",
                         form=form,
                     )
 
             if not hospital:
                 hospital = Hospital.query.first()
                 if not hospital:
-                    flash("Error: No hospital found in the system.", "danger")
+                    flash("Erro: Nenhum hospital encontrado no sistema.", "danger")
                     return render_template(
                         "registrar.html",
-                        title="Complete Registration: Resident",
+                        title="Finalizar Cadastro: Residente",
                         form=form,
                     )
 
@@ -565,12 +567,12 @@ def registrar():
             db.session.commit()
             session.pop("crm_verificado", None)
             flash(
-                "Registration completed successfully! You can now log in.",
+                "Cadastro concluído com sucesso! Você já pode fazer login.",
                 "success",
             )
             return redirect(url_for("main.login"))
     return render_template(
-        "registrar.html", title="Complete Registration: Resident", form=form
+        "registrar.html", title="Finalizar Cadastro: Residente", form=form
     )
 
 
@@ -580,7 +582,7 @@ def registrar_preceptor():
         return redirect(url_for("main.home"))
 
     if "crm_verificado" not in session:
-        flash("Please verify your CRM first.", "info")
+        flash("Por favor, verifique seu CRM primeiro.", "info")
         return redirect(url_for("main.verificar_crm"))
 
     form = RegistroPreceptorForm()
@@ -589,9 +591,9 @@ def registrar_preceptor():
 
     if form.validate_on_submit():
         if Preceptor.query.filter_by(email=form.email.data).first():
-            flash("This email is already in use. Please choose another.", "danger")
+            flash("Este email já está em uso. Escolha outro.", "danger")
         elif Preceptor.query.filter_by(cpf=form.cpf.data).first():
-            flash("This CPF is already registered.", "danger")
+            flash("Este CPF já está cadastrado.", "danger")
         else:
             universidade = Universidade.query.filter_by(
                 nome=form.instituicao.data
@@ -600,12 +602,12 @@ def registrar_preceptor():
 
             if not universidade or not hospital:
                 flash(
-                    "Configuration error: The default institution or hospital was not found in the database.",
+                    "Erro de configuração: A instituição ou hospital padrão não foi encontrado no banco de dados.",
                     "danger",
                 )
                 return render_template(
                     "registrar_preceptor.html",
-                    title="Complete Registration: Preceptor",
+                    title="Finalizar Cadastro: Preceptor",
                     form=form,
                 )
             crm_info = session.get("crm_verificado", {})
@@ -627,11 +629,11 @@ def registrar_preceptor():
 
             session.pop("crm_verificado", None)
             flash(
-                "Preceptor registration completed successfully! You can now log in.",
+                "Cadastro de preceptor concluído com sucesso! Você já pode fazer login.",
                 "success",
             )
             return redirect(url_for("main.login"))
 
     return render_template(
-        "registrar_preceptor.html", title="Complete Registration: Preceptor", form=form
+        "registrar_preceptor.html", title="Finalizar Cadastro: Preceptor", form=form
     )
